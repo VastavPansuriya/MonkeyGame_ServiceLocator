@@ -1,18 +1,17 @@
+using System.Collections.Generic;
+using UnityEngine;
+using System.Threading.Tasks;
+using ServiceLocator.Wave.Bloon;
+using ServiceLocator.Utilities;
 using ServiceLocator.Events;
+using ServiceLocator.UI;
 using ServiceLocator.Map;
 using ServiceLocator.Sound;
-using ServiceLocator.UI;
-using ServiceLocator.Wave.Bloon;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using UnityEngine;
 
 namespace ServiceLocator.Wave
 {
-    public class WaveService : GenericSingleton<WaveService>
+    public class WaveService : GenericMonoSingleton<WaveService>
     {
-        [SerializeField] private EventService eventService;
-
         [SerializeField] private WaveScriptableObject waveScriptableObject;
         private BloonPool bloonPool;
 
@@ -22,17 +21,12 @@ namespace ServiceLocator.Wave
 
         private void Start()
         {
-            InitializeBloons();
+            bloonPool = new BloonPool(waveScriptableObject);
+            activeBloons = new List<BloonController>();
             SubscribeToEvents();
         }
 
-        private void InitializeBloons()
-        {
-            bloonPool = new BloonPool(waveScriptableObject);
-            activeBloons = new List<BloonController>();
-        }
-
-        private void SubscribeToEvents() => eventService.OnMapSelected.AddListener(LoadWaveDataForMap);
+        private void SubscribeToEvents() => EventService.Instance.OnMapSelected.AddListener(LoadWaveDataForMap);
 
         private void LoadWaveDataForMap(int mapId)
         {
@@ -51,7 +45,7 @@ namespace ServiceLocator.Wave
 
         public async void SpawnBloons(List<BloonType> bloonsToSpawn, Vector3 spawnPosition, int startingWaypointIndex, float spawnRate)
         {
-            foreach (BloonType bloonType in bloonsToSpawn)
+            foreach(BloonType bloonType in bloonsToSpawn)
             {
                 BloonController bloon = bloonPool.GetBloon(bloonType);
                 bloon.SetPosition(spawnPosition);
@@ -77,7 +71,7 @@ namespace ServiceLocator.Wave
                 SoundService.Instance.PlaySoundEffects(Sound.SoundType.WaveComplete);
                 UIService.Instance.UpdateWaveProgressUI(currentWaveId, waveDatas.Count);
 
-                if (IsLevelWon())
+                if(IsLevelWon())
                     UIService.Instance.UpdateGameEndUI(true);
                 else
                     UIService.Instance.SetNextWaveButton(true);
