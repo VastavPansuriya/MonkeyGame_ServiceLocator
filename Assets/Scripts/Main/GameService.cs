@@ -32,30 +32,37 @@ namespace ServiceLocator.Main
         [SerializeField] private AudioSource SFXSource;
         [SerializeField] private AudioSource BGSource;
 
+        protected override void Awake()
+        {
+            base.Awake();
+            InitService();
+        }
         private void Start()
         {
-            InitService();
             InitServiceData();
         }
 
         private void InitService()
         {
             EventService = new EventService();
-            UIService.SubscribeToEvents();
-            MapService = new MapService(mapScriptableObject);
+            MapService = new MapService(mapScriptableObject); 
             WaveService = new WaveService(waveScriptableObject);
             SoundService = new SoundService(soundScriptableObject, SFXSource, BGSource);
             PlayerService = new PlayerService(playerScriptableObject);
+            Debug.Log(PlayerService);
         }
 
         private void InitServiceData()
         {
-            PlayerService.Init(UIService,MapService,SoundService);
+            PlayerService.Init(UIService, MapService, SoundService);
+            WaveService.Init(EventService,UIService,MapService,SoundService);
+            MapService.Init(EventService);
+            UIService.Init(EventService, WaveService);
         }
 
         private void Update()
         {
-            PlayerService.Update();
+            PlayerService.Update(); 
         }
     }
 }

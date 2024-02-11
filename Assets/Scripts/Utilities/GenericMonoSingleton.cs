@@ -4,14 +4,13 @@ namespace ServiceLocator.Utilities
 {
     public class GenericMonoSingleton<T> : MonoBehaviour where T : GenericMonoSingleton<T>
     {
-        private static T instance;
-        public static T Instance { get { return instance; } }
+        public static T Instance { get; private set; }
 
         protected virtual void Awake()
         {
-            if (instance == null)
+            if (Instance == null) 
             {
-                instance = (T)this;
+                Instance = (T)this;
             }
             else
             {
