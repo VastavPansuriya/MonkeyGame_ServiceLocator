@@ -25,6 +25,7 @@ namespace ServiceLocator.Player
         {
             this.playerScriptableObject = playerScriptableObject;
             projectilePool = new ProjectilePool(playerScriptableObject.ProjectilePrefab, playerScriptableObject.ProjectileScriptableObjects);
+            projectilePool.Init(this);
         }
 
         public void Init(UIService uIService, MapService mapService, SoundService soundService)
@@ -112,7 +113,7 @@ namespace ServiceLocator.Player
         {
             MonkeyScriptableObject monkeyScriptableObject = GetMonkeyScriptableObjectByType(monkeyType);
             MonkeyController monkey = new MonkeyController(monkeyScriptableObject, projectilePool);
-
+            monkey.Init(soundService);
             monkey.SetPosition(spawnPosition);
             activeMonkeys.Add(monkey);
 
