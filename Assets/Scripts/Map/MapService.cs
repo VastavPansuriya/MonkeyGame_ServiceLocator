@@ -1,13 +1,15 @@
-using ServiceLocator.Player;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using ServiceLocator.Main;
+using ServiceLocator.Player;
 
 namespace ServiceLocator.Map
 {
     public class MapService
     {
         private MapScriptableObject mapScriptableObject;
+
         private Grid currentGrid;
         private Tilemap currentTileMap;
         private MapData currentMapData;
@@ -16,9 +18,9 @@ namespace ServiceLocator.Map
         public MapService(MapScriptableObject mapScriptableObject)
         {
             this.mapScriptableObject = mapScriptableObject;
-            SubscribeToEvents();
             tileOverlay = Object.Instantiate(mapScriptableObject.TileOverlay).GetComponent<SpriteRenderer>();
             ResetTileOverlay();
+            SubscribeToEvents();
         }
 
         private void SubscribeToEvents() => GameService.Instance.EventService.OnMapSelected.AddListener(LoadMap);
@@ -26,7 +28,7 @@ namespace ServiceLocator.Map
         private void LoadMap(int mapId)
         {
             currentMapData = mapScriptableObject.MapDatas.Find(mapData => mapData.MapID == mapId);
-            currentGrid = MonoBehaviour.Instantiate(currentMapData.MapPrefab);
+            currentGrid = Object.Instantiate(currentMapData.MapPrefab);
             currentTileMap = currentGrid.GetComponentInChildren<Tilemap>();
         }
 
@@ -74,13 +76,13 @@ namespace ServiceLocator.Map
         {
             Vector3 mousePosition = Camera.main.ScreenToWorldPoint(cursorPosition);
             Vector3Int cellPosition = GetCellPosition(mousePosition);
-            Vector3 cellCenter = GetCenterOfCell(cellPosition);
-
+            Vector3 centerCell = GetCenterOfCell(cellPosition);
+            
             ResetTileOverlay();
 
-            if (CanSpawnOnPosition(cellCenter, cellPosition))
+            if (CanSpawnOnPosition(centerCell, cellPosition))
             {
-                spawnPosition = cellCenter;
+                spawnPosition = centerCell;
                 return true;
             }
             else

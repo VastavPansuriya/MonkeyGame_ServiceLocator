@@ -1,7 +1,6 @@
-using ServiceLocator.Player;
-using ServiceLocator.Sound;
 using System.Collections.Generic;
 using UnityEngine;
+using ServiceLocator.Main;
 
 namespace ServiceLocator.Wave.Bloon
 {
@@ -50,8 +49,6 @@ namespace ServiceLocator.Wave.Bloon
             currentWaypointIndex = startingWaypointIndex;
         }
 
-        public void SetOrderInLayer(int orderInLayer) => bloonView.SetSortingOrder(orderInLayer);
-
         public void TakeDamage(int damageToTake)
         {
             int reducedHealth = currentHealth - damageToTake;
@@ -94,6 +91,8 @@ namespace ServiceLocator.Wave.Bloon
 
         private void MoveBloon(Vector3 moveDirection) => bloonView.transform.Translate(moveDirection.normalized * bloonScriptableObject.Speed * Time.deltaTime);
 
+        public void SetOrderInLayer(int orderInLayer) => bloonView.SetSortingOrder(orderInLayer);
+
         private void PopBloon()
         {
             SetState(BloonState.POPPED);
@@ -112,9 +111,9 @@ namespace ServiceLocator.Wave.Bloon
         private bool HasLayeredBloons() => bloonScriptableObject.LayeredBloons.Count > 0;
 
         private void SpawnLayeredBloons() => GameService.Instance.WaveService.SpawnBloons(bloonScriptableObject.LayeredBloons,
-                                                                              bloonView.transform.position,
-                                                                              currentWaypointIndex,
-                                                                              bloonScriptableObject.LayerBloonSpawnRate);
+                                                                                          bloonView.transform.position,
+                                                                                          currentWaypointIndex,
+                                                                                          bloonScriptableObject.LayerBloonSpawnRate);
 
         public BloonType GetBloonType() => bloonScriptableObject.Type;
 
