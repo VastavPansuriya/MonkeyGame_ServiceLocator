@@ -3,18 +3,14 @@ using UnityEngine;
 
 namespace ServiceLocator.Sound
 {
-    public class SoundService
+    public class SoundService : MonoBehaviour
     {
-        private SoundScriptableObject soundScriptableObject;
-        private AudioSource audioEffects;
-        private AudioSource backgroundMusic;
+        [SerializeField] private SoundScriptableObject soundScriptableObject;
+        [SerializeField] private AudioSource audioEffects;
+        [SerializeField] private AudioSource backgroundMusic;
 
-
-        public SoundService(SoundScriptableObject soundScriptableObject, AudioSource audioEffects, AudioSource backgroundMusic)
+        private void Start()
         {
-            this.soundScriptableObject = soundScriptableObject;
-            this.audioEffects = audioEffects;
-            this.backgroundMusic = backgroundMusic;
             PlaybackgroundMusic(SoundType.BackgroundMusic, true);
         }
 

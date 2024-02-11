@@ -1,34 +1,34 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using ServiceLocator.Main;
 using ServiceLocator.Player;
+using ServiceLocator.Events;
 
 namespace ServiceLocator.Map
 {
-    public class MapService
+    public class MapService : MonoBehaviour
     {
-        private MapScriptableObject mapScriptableObject;
+        [SerializeField] private EventService eventService;
+        [SerializeField] private MapScriptableObject mapScriptableObject;
 
         private Grid currentGrid;
         private Tilemap currentTileMap;
         private MapData currentMapData;
         private SpriteRenderer tileOverlay;
 
-        public MapService(MapScriptableObject mapScriptableObject)
+        private void Start()
         {
-            this.mapScriptableObject = mapScriptableObject;
+            SubscribeToEvents();
             tileOverlay = Object.Instantiate(mapScriptableObject.TileOverlay).GetComponent<SpriteRenderer>();
             ResetTileOverlay();
-            SubscribeToEvents();
         }
 
-        private void SubscribeToEvents() => GameService.Instance.EventService.OnMapSelected.AddListener(LoadMap);
+        private void SubscribeToEvents() => eventService.OnMapSelected.AddListener(LoadMap);
 
         private void LoadMap(int mapId)
         {
             currentMapData = mapScriptableObject.MapDatas.Find(mapData => mapData.MapID == mapId);
-            currentGrid = Object.Instantiate(currentMapData.MapPrefab);
+            currentGrid = Instantiate(currentMapData.MapPrefab);
             currentTileMap = currentGrid.GetComponentInChildren<Tilemap>();
         }
 
@@ -76,13 +76,13 @@ namespace ServiceLocator.Map
         {
             Vector3 mousePosition = Camera.main.ScreenToWorldPoint(cursorPosition);
             Vector3Int cellPosition = GetCellPosition(mousePosition);
-            Vector3 centerCell = GetCenterOfCell(cellPosition);
-            
+            Vector3 cellCenter = GetCenterOfCell(cellPosition);
+
             ResetTileOverlay();
 
-            if (CanSpawnOnPosition(centerCell, cellPosition))
+            if (CanSpawnOnPosition(cellCenter, cellPosition))
             {
-                spawnPosition = centerCell;
+                spawnPosition = cellCenter;
                 return true;
             }
             else
@@ -96,9 +96,9 @@ namespace ServiceLocator.Map
 
         private Vector3 GetCenterOfCell(Vector3Int cellPosition) => currentGrid.GetCellCenterWorld(cellPosition);
 
-        private bool CanSpawnOnPosition(Vector3 centerCell, Vector3Int cellPosition)
+        private bool CanSpawnOnPosition(Vector3 cellCenter, Vector3Int cellPosition)
         {
-            Collider2D[] colliders = Physics2D.OverlapCircleAll(centerCell, 0.1f);
+            Collider2D[] colliders = Physics2D.OverlapCircleAll(cellCenter, 0.1f);
             return InisdeTilemapBounds(cellPosition) && !HasClickedOnObstacle(colliders) && !IsOverLappingMonkey(colliders);
         }
 
@@ -123,9 +123,7 @@ namespace ServiceLocator.Map
             foreach (Collider2D collider in colliders)
             {
                 if (collider.gameObject.GetComponent<MonkeyView>() != null && !collider.isTrigger)
-                {
                     return true;
-                }
             }
             return false;
         }
