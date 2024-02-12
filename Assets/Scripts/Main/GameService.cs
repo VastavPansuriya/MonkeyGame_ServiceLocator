@@ -9,7 +9,7 @@ using ServiceLocator.UI;
 
 namespace ServiceLocator.Main
 {
-    public class GameService : GenericMonoSingleton<GameService>
+    public class GameService : MonoBehaviour
     {
         // Services:
         public EventService EventService { get; private set; }
@@ -32,9 +32,8 @@ namespace ServiceLocator.Main
         [SerializeField] private AudioSource SFXSource;
         [SerializeField] private AudioSource BGSource;
 
-        protected override void Awake()
+        private void Awake()
         {
-            base.Awake();
             InitService();
         }
         private void Start()

@@ -52,6 +52,7 @@ namespace ServiceLocator.UI
             nextWaveButton.onClick.AddListener(OnNextWaveButton);
             quitButton.onClick.AddListener(OnQuitButtonClicked);
             playAgainButton.onClick.AddListener(OnPlayAgainButtonClicked);
+            Map1Button.GetComponent<MapButton>().Init(eventService);
         }
 
         public void Init(EventService eventService, WaveService waveService, PlayerService playerService)
